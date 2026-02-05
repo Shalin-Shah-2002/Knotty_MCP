@@ -1,0 +1,18 @@
+# Continue.dev MCP Configuration
+# Add this to: %USERPROFILE%\.continue\config.json
+
+{
+  "experimental": {
+    "modelContextProtocolServers": [
+      {
+        "name": "swagger-api",
+        "command": "node",
+        "args": ["d:\\S_Projects\\Swagger_MCP\\dist\\index.js"],
+        "env": {
+          "OPENAPI_SPEC_URL": "https://petstore.swagger.io/v2/swagger.json",
+          "LOG_LEVEL": "info"
+        }
+      }
+    ]
+  }
+}

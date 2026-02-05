@@ -1,0 +1,30 @@
+# Ignore node_modules
+node_modules/
+npm-debug.log*
+
+# Ignore build output (we copy it separately in multi-stage build)
+# dist/
+
+# Ignore development files
+.git/
+.gitignore
+*.md
+.env*
+!.env.example
+
+# Ignore tests
+**/*.test.ts
+**/*.spec.ts
+coverage/
+.nyc_output/
+
+# Ignore IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ignore OS files
+.DS_Store
+Thumbs.db

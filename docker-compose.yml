@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  knotty:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: knotty
+    restart: unless-stopped
+    environment:
+      # Required: URL to your OpenAPI/Swagger specification
+      - OPENAPI_SPEC_URL=${OPENAPI_SPEC_URL:-https://petstore.swagger.io/v2/swagger.json}
+      
+      # Optional: Bearer token for authenticated Swagger endpoints
+      - SWAGGER_AUTH_TOKEN=${SWAGGER_AUTH_TOKEN:-}
+      
+      # Cache refresh interval in minutes
+      - CACHE_REFRESH_MINUTES=${CACHE_REFRESH_MINUTES:-10}
+      
+      # Rate limiting: max requests per minute
+      - RATE_LIMIT_MAX=${RATE_LIMIT_MAX:-60}
+      
+      # Log level: debug, info, warn, error
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      
+      # Server identification
+      - MCP_SERVER_NAME=${MCP_SERVER_NAME:-knotty}
+      - MCP_SERVER_VERSION=${MCP_SERVER_VERSION:-1.0.0}
+    
+    # MCP servers use stdio, so we need these settings
+    stdin_open: true
+    tty: true
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+        reservations:
+          memory: 128M
+          cpus: '0.25'
+    
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Example: Running with a specific API spec
+  knotty-petstore:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: knotty-petstore
+    restart: unless-stopped
+    profiles:
+      - examples
+    environment:
+      - OPENAPI_SPEC_URL=https://petstore.swagger.io/v2/swagger.json
+      - LOG_LEVEL=debug
+    stdin_open: true
+    tty: true
