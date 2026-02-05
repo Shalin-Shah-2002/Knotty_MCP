@@ -166,11 +166,13 @@ const TOOLS = [
         },
         body: {
           type: 'object',
+          additionalProperties: true,
           description:
             'Request body for POST/PUT/PATCH requests. Will be sent as JSON. Example: { "name": "John", "email": "john@example.com" }',
         },
         headers: {
           type: 'object',
+          additionalProperties: true,
           description:
             'Custom headers to include in the request. Example: { "X-API-Key": "abc123", "Accept-Language": "en" }',
         },
@@ -188,6 +190,41 @@ const TOOLS = [
           type: 'boolean',
           description: 'Whether to follow HTTP redirects (default: true)',
           default: true,
+        },
+      },
+      required: ['url'],
+    },
+  },
+  {
+    name: 'req',
+    description:
+      'Shorthand for executeApiRequest - make HTTP requests quickly! Send GET, POST, PUT, PATCH, DELETE requests with custom body, headers, and auth. Use this to test any API endpoint.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        url: {
+          type: 'string',
+          description: 'Full URL for the API request',
+        },
+        method: {
+          type: 'string',
+          description: 'HTTP method (GET, POST, PUT, PATCH, DELETE)',
+          enum: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
+          default: 'GET',
+        },
+        body: {
+          type: 'object',
+          additionalProperties: true,
+          description: 'Request body (JSON) for POST/PUT/PATCH',
+        },
+        headers: {
+          type: 'object',
+          additionalProperties: true,
+          description: 'Custom headers as key-value pairs',
+        },
+        authToken: {
+          type: 'string',
+          description: 'Bearer token for Authorization header',
         },
       },
       required: ['url'],
@@ -398,6 +435,38 @@ class SwaggerMcpServer {
             }
 
             const result = await this.toolHandler.executeApiRequest(requestArgs);
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(result, null, 2),
+                },
+              ],
+            };
+          }
+
+          case 'req': {
+            // Shorthand alias for executeApiRequest
+            const requestArgs = args as {
+              url: string;
+              method?: string;
+              body?: Record<string, unknown>;
+              headers?: Record<string, string>;
+              authToken?: string;
+            };
+
+            if (!requestArgs.url || typeof requestArgs.url !== 'string') {
+              throw new McpError(
+                ErrorCode.InvalidParams,
+                'url parameter is required and must be a string'
+              );
+            }
+
+            const result = await this.toolHandler.executeApiRequest({
+              ...requestArgs,
+              timeout: 30000,
+              followRedirects: true,
+            });
             return {
               content: [
                 {
