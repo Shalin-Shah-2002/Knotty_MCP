@@ -1,4 +1,4 @@
-<![CDATA[<div align="center">
+<div align="center">
 
 # 🪢 Knotty
 
@@ -409,4 +409,3 @@ MIT — Use it, modify it, ship it. Just don't blame me if your API still doesn'
 **[⬆ Back to Top](#-knotty)**
 
 </div>
-]]>
